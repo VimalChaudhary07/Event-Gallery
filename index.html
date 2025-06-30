@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Mavryck Events</title>
+    <link rel="icon" type="image/jpeg" href="/kailash-gupta.jpg">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <rect x="7" y="2" width="10" height="4" rx="1" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <span class="brand-text">mavryck_events</span>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Home</a>
+                <a href="#" class="nav-link active">Gallery</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
+                </svg>
+                Premium Event Gallery
+            </div>
+            <h1 class="hero-title">
+                Creating Unforgettable
+                <span class="hero-title-accent">Experiences</span>
+            </h1>
+            <p class="hero-description">
+                Explore our curated collection of memorable events and celebrations. 
+                From intimate gatherings to grand celebrations, witness the magic we create.
+            </p>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="gallery-header">
+            <h2>Event Gallery</h2>
+            <p>Discover the moments that matter</p>
+        </div>
+        
+        <div id="gallery-container" class="gallery">
+            <!-- Photos will be loaded dynamically here -->
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading gallery...</p>
+        </div>
+        
+        <div id="no-photos" class="no-photos" style="display: none;">
+            <div class="no-photos-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2"/>
+                    <polyline points="21,15 16,10 5,21" stroke="currentColor" stroke-width="2"/>
+                </svg>
+            </div>
+            <h3>No photos found</h3>
+            <p>Add your event images to the /images/ folder to see them here.</p>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
