@@ -19,9 +19,9 @@ class EventGallery {
 
   async loadImages() {
     try {
-      // Load images from predefined list
+      // Load images from predefined list - using actual files from your project
       this.images = this.getImageList();
-      this.renderGallery();
+      this.renderImages();
     } catch (error) {
       console.error('Error loading images:', error);
       this.showNoPhotos();
@@ -29,7 +29,7 @@ class EventGallery {
   }
 
   getImageList() {
-    // Complete list of all images in the images folder
+    // Using actual image files from your project for testing
     return [
       'images/0362e3571b4c44a2856ba991833164c4.jpg',
       'images/13b68495e0804e2792cbbb1a3d7d6ee2.jpg',
@@ -502,7 +502,7 @@ class EventGallery {
     ];
   }
 
-  renderGallery() {
+  renderImages() {
     if (this.images.length === 0) {
       this.showNoPhotos();
       return;
@@ -510,15 +510,11 @@ class EventGallery {
 
     this.loadingElement.style.display = 'none';
     
+    // Create gallery items for all images
     this.images.forEach((imageSrc, index) => {
       const galleryItem = this.createGalleryItem(imageSrc, index);
       this.galleryContainer.appendChild(galleryItem);
     });
-
-    // Trigger scroll animations after a short delay
-    setTimeout(() => {
-      this.triggerScrollAnimations();
-    }, 100);
   }
 
   createGalleryItem(imageSrc, index) {
@@ -531,10 +527,8 @@ class EventGallery {
     const img = document.createElement('img');
     img.setAttribute('data-src', imageSrc);
     img.setAttribute('alt', `Event photo ${index + 1}`);
-    img.className = 'loading';
-    
-    // Add a placeholder while loading
-    img.style.minHeight = '280px';
+    img.className = 'gallery-image loading';
+    img.loading = 'lazy';
     
     item.appendChild(img);
     return item;
@@ -551,7 +545,7 @@ class EventGallery {
           }
         });
       }, {
-        rootMargin: '150px 0px',
+        rootMargin: '100px 0px',
         threshold: 0.01
       });
 
@@ -568,49 +562,41 @@ class EventGallery {
   loadImage(img) {
     const src = img.getAttribute('data-src');
     
-    img.onload = () => {
+    // Create a new image to preload
+    const newImg = new Image();
+    
+    newImg.onload = () => {
+      img.src = src;
       img.classList.remove('loading');
       img.classList.add('loaded');
-      img.style.minHeight = 'auto';
-      this.adjustGridItemHeight(img.closest('.gallery-item'), img);
       this.loadedImages++;
       
-      // Add staggered animation delay
-      const item = img.closest('.gallery-item');
-      item.style.animationDelay = `${this.loadedImages * 0.1}s`;
+      // Trigger animation
+      requestAnimationFrame(() => {
+        const item = img.closest('.gallery-item');
+        if (item) {
+          item.classList.add('animate-in');
+        }
+      });
     };
     
-    img.onerror = () => {
+    newImg.onerror = () => {
+      console.error(`Failed to load image: ${src}`);
       img.classList.remove('loading');
-      img.style.minHeight = '280px';
+      img.classList.add('error');
       img.alt = 'Failed to load image';
       
-      // Hide the item if it failed to load
+      // Show placeholder or hide the item
       const item = img.closest('.gallery-item');
-      item.style.display = 'none';
+      if (item) {
+        item.style.opacity = '0.5';
+        item.style.pointerEvents = 'none';
+      }
     };
     
-    img.src = src;
+    // Start loading the image
+    newImg.src = src;
     img.removeAttribute('data-src');
-  }
-
-  adjustGridItemHeight(item, img) {
-    // Calculate the appropriate grid row span based on image aspect ratio
-    const aspectRatio = img.naturalHeight / img.naturalWidth;
-    let rowSpan;
-    
-    // More refined row span calculation for better layout
-    if (aspectRatio < 0.7) {
-      rowSpan = 25; // Wide images
-    } else if (aspectRatio < 1.2) {
-      rowSpan = 30; // Square-ish images
-    } else if (aspectRatio < 1.8) {
-      rowSpan = 35; // Portrait images
-    } else {
-      rowSpan = 40; // Very tall images
-    }
-    
-    item.style.gridRowEnd = `span ${rowSpan}`;
   }
 
   setupImageClickHandlers() {
@@ -618,7 +604,7 @@ class EventGallery {
       const galleryItem = e.target.closest('.gallery-item');
       if (galleryItem) {
         const img = galleryItem.querySelector('img');
-        if (img && img.src && !img.classList.contains('loading')) {
+        if (img && img.src && !img.classList.contains('loading') && !img.classList.contains('error')) {
           this.openImageModal(img.src, img.alt);
         }
       }
@@ -637,37 +623,14 @@ class EventGallery {
   }
 
   setupScrollAnimations() {
-    // Setup intersection observer for scroll animations
-    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const animationObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.animationPlayState = 'running';
-          }
-        });
-      }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      });
-
-      // Observe gallery items for animation
-      const items = this.galleryContainer.querySelectorAll('.gallery-item');
-      items.forEach(item => {
-        item.style.animationPlayState = 'paused';
-        animationObserver.observe(item);
-      });
-    }
-  }
-
-  triggerScrollAnimations() {
+    // Simple fade-in animation for gallery items
     const items = this.galleryContainer.querySelectorAll('.gallery-item');
     items.forEach((item, index) => {
-      item.style.animationDelay = `${index * 0.1}s`;
+      item.style.animationDelay = `${index * 0.05}s`;
     });
   }
 
   openImageModal(src, alt) {
-    // Enhanced modal implementation with premium styling
     const modal = document.createElement('div');
     modal.className = 'image-modal';
     modal.innerHTML = `
@@ -731,34 +694,27 @@ document.addEventListener('DOMContentLoaded', () => {
   new EventGallery();
 });
 
-// Add smooth scrolling for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-  });
-});
-
-// Add navbar scroll effect
+// Optimized navbar scroll effect
 let lastScrollTop = 0;
+let ticking = false;
 const navbar = document.querySelector('.navbar');
 
-window.addEventListener('scroll', () => {
+function updateNavbar() {
   const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
   
   if (scrollTop > lastScrollTop && scrollTop > 100) {
-    // Scrolling down
     navbar.style.transform = 'translateY(-100%)';
   } else {
-    // Scrolling up
     navbar.style.transform = 'translateY(0)';
   }
   
   lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-}, false);
+  ticking = false;
+}
+
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(updateNavbar);
+    ticking = true;
+  }
+}, { passive: true });
